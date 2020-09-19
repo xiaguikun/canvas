@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #mycanvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="mycanvas" width="400" height="400"></canvas>
+    <script>
+        let canvas = document.querySelector('#mycanvas');
+        let context = canvas.getContext('2d');
+
+        let direction = 2;
+        let timer = null;
+        let x = 8;
+        let y = 8;
+        let size = 8;
+        let len = 10;
+        let speed = 100;
+        let map = [];
+        let ranx;
+        let rany;
+
+        function game() {
+            switch (direction) {
+                case 0:
+                    x = x - size;
+                    break;
+                case 1:
+                    y = y - size;
+                    break;
+                case 2:
+                    x = x + size;
+                    break;
+                case 3:
+                    y = y + size;
+                    break;
+
+            }
+
+            if (x > canvas.width || x < 0 || y > canvas.height || y < 0) {
+                clearInterval(timer);
+                alert('game over');
+                location.reload();
+            }
+
+            let crash = map.some(function(elm) {
+                return elm.x === x && elm.y === y;
+            });
+
+            if (crash) {
+                clearInterval(timer);
+                alert('game over');
+                location.reload();
+            }
+
+            map.push({
+                x: x,
+                y: y
+            });
+
+            if (ranx == x && rany == y) {
+                len++;
+                getFood();
+            }
+            if (map.length > len) {
+                let one = map.shift();
+                context.clearRect(one.x, one.y, size, size);
+            }
+
+
+            context.fillStyle = "green";
+            context.fillRect(x, y, size, size);
+        }
+
+        function getFood() {
+            ranx = Math.floor(Math.random() * 50) * 8;
+            rany = Math.floor(Math.random() * 50) * 8;
+            let has = map.some(function(elm, i) {
+                return map.x === ranx && map.y === rany;
+            });
+            if (has) {
+                return arguments.callee();
+            };
+            context.fillStyle = "red";
+            context.fillRect(ranx, rany, size, size);
+        }
+        getFood();
+
+        timer = setInterval(game, speed);
+
+        document.onkeydown = function(ev) {
+            if (ev.keyCode >= 37 && ev.keyCode <= 40) {
+                direction = ev.keyCode - 37;
+                console.log(direction);
+            }
+        }
+    </script>
+</body>
+
+</html>
